@@ -1,4 +1,4 @@
-package com.paulo.javabase;
+package com.paulo.javabase.module1;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -15,13 +15,35 @@ public class WhichDay {
     private static final int notRunTwoDays = 28;
 
     public static void main(String[] args) {
-        System.out.println("请输入年、月、日");
+        System.out.println("请输入年、月、日,用空格分隔，任意数字为-1退出程序");
         Scanner sc = new Scanner(System.in);
-        int year = sc.nextInt();
-        int month = sc.nextInt();
-        int day = sc.nextInt();
+        while(true){
+            int year = sc.nextInt();
+            if(-1 == year){
+                System.out.println("程序退出..");
+                return;
+            }
+            int month = sc.nextInt();
+            if(-1 == month){
+                System.out.println("程序退出..");
+                return;
+            }
+            int day = sc.nextInt();
+            if(-1 == day){
+                System.out.println("程序退出..");
+                return;
+            }
+            int days = witchDay(year, month, day);
+            if (days <= 0) {
+                System.out.println("输入的日期有误");
+            } else {
+                System.out.println("输入的日期是当年的第" + days + "天");
+            }
+        }
 
+    }
 
+    private static int witchDay(int year,int month,int day){
         int totalDay = totalDay(year);
 
         //存放一年中所有的天
@@ -55,12 +77,12 @@ public class WhichDay {
 
         for(int i= 0;i<arr.length;i++){
             if(arr[i].equals(searchStr)){
-                System.out.println("输入的年月日是当年的第" + (i + 1) + "天");
-                return;
+
+                return (i + 1);
             }
         }
 
-        System.out.println("输入的年月日有误");
+        return -1;
     }
 
     /**

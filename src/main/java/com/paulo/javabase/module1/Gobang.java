@@ -1,4 +1,4 @@
-package com.paulo.javabase;
+package com.paulo.javabase.module1;
 
 /**
  * 五子棋游戏棋盘的绘制

@@ -1,4 +1,4 @@
-package com.paulo.javabase;
+package com.paulo.javabase.module1;
 
 import java.util.Arrays;
 import java.util.Random;

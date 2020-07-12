@@ -1,4 +1,4 @@
-package com.paulo.javabase;
+package com.paulo.javabase.module1;
 
 /**
  * 找出 1000 以内的所有完数并打印出来
