@@ -35,12 +35,17 @@ public class SubStr {
             return str2;
         }
 
-        for (int i = 1; i < str2.length(); i++) {
-            for (int j = 0; j < i + 1; j++) {
-                String substring = str2.substring(j, str2.length() - i + j);
-                if (str1.contains(substring)) {
-                    return substring;
+        for (int i = 1; i < str2.length(); i++) {// 获取length - i长度的所有子串
+
+            int start = 0, end = str2.length() - i;
+
+            while (end < str2.length()) { //取出所有子串
+                String subStr = str2.substring(start, end);
+                if (str1.contains(subStr)) {
+                    return subStr;
                 }
+                start++;
+                end++;
             }
         }
 

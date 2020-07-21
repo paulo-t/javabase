@@ -103,12 +103,6 @@ public class Poker {
      * 排序
      */
     private static void sort(List<String> pokers) {
-        pokers.sort(new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-
-                return o1.length() - o2.length() == 0 ? o1.compareTo(o2) : o1.length() - o2.length();
-            }
-        });
+        pokers.sort((o1, o2) -> o1.length() - o2.length() == 0 ? o1.compareTo(o2) : o1.length() - o2.length());
     }
 }
