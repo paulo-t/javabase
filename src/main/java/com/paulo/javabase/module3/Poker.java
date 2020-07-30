@@ -2,7 +2,6 @@ package com.paulo.javabase.module3;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -22,27 +21,28 @@ public class Poker {
     /**
      * 左右的扑克牌数字
      */
-    private static final String[] pokerNums = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "k"};
+    private static final String[] pokerNums = {"3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "k","A","2"};
     /**
      * 初始的牌库
      */
-    private List<String> pokerPool = new ArrayList<>();
+    private List<Card> pokerPool = new ArrayList<>();
 
 
     /**
      * 初始化牌库
      */ {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < pokerNums.length; j++) {
-                pokerPool.add(pokerNums[j]);
+        for (PokerTypeEnum value : PokerTypeEnum.values()) {
+            for (int i = 0; i < pokerNums.length; i++) {
+                pokerPool.add(new Card(pokerNums[i],value.getDesc(),pokerNums.length - i + 2));
             }
         }
 
-        pokerPool.add("小王");
-        pokerPool.add("大王");
+
+        pokerPool.add(new Card("小王","",2));
+        pokerPool.add(new Card("大王","",1));
     }
 
-    private List<String> getPokerPool() {
+    private List<Card> getPokerPool() {
         return pokerPool;
     }
 
@@ -50,12 +50,12 @@ public class Poker {
     public static void main(String[] args) {
         Poker poker = new Poker();
         //洗牌
-        List<String> shuffle = shuffle(poker);
+        List<Card> shuffle = shuffle(poker);
         //摸排
-        List<String> playerOne = new ArrayList<>();
-        List<String> playerTwo = new ArrayList<>();
-        List<String> playerThree = new ArrayList<>();
-        List<String> background = new ArrayList<>();
+        List<Card> playerOne = new ArrayList<>();
+        List<Card> playerTwo = new ArrayList<>();
+        List<Card> playerThree = new ArrayList<>();
+        List<Card> background = new ArrayList<>();
 
         send(shuffle, playerOne, playerTwo, playerThree, background);
 
@@ -64,18 +64,37 @@ public class Poker {
         sort(playerThree);
         sort(background);
 
-        System.out.println("玩家一的手牌: " + playerOne);
-        System.out.println("玩家二的手牌: " + playerTwo);
-        System.out.println("玩家三的手牌: " + playerThree);
-        System.out.println("底牌: " + background);
+        System.out.print("玩家一的手牌: ");
+        print(playerOne);
+        System.out.println("");
+
+        System.out.print("玩家二的手牌: ");
+        print(playerTwo);
+        System.out.println("");
+
+
+        System.out.print("玩家三的手牌: ");
+        print(playerThree);
+        System.out.println("");
+
+        System.out.print("底牌: " );
+        print(background);
     }
 
-
+    private static void print(List<Card> cards){
+        for (int i = 0; i < cards.size(); i++) {
+            if(i == cards.size() - 1){
+                System.out.print(cards.get(i).getNum());
+            }else {
+                System.out.print(cards.get(i).getNum() + ",");
+            }
+        }
+    }
     /**
      * 洗牌
      */
-    public static List<String> shuffle(Poker poker) {
-        List<String> pokerPool = new ArrayList<>();
+    public static List<Card> shuffle(Poker poker) {
+        List<Card> pokerPool = new ArrayList<>();
         pokerPool.addAll(poker.getPokerPool());
         Collections.shuffle(pokerPool);
 
@@ -85,7 +104,7 @@ public class Poker {
     /**
      * 摸排
      */
-    public static void send(List<String> pool, List<String> playerOne, List<String> playerTwo, List<String> playerThree, List<String> background) {
+    public static void send(List<Card> pool, List<Card> playerOne, List<Card> playerTwo, List<Card> playerThree, List<Card> background) {
         for (int i = 0; i < pool.size() - 3; i++) {
             if (i % 3 == 0) {
                 playerOne.add(pool.get(i));
@@ -96,13 +115,73 @@ public class Poker {
             }
         }
 
-        background.addAll(pool.subList(pool.size() - 4, pool.size() - 1));
+        background.addAll(pool.subList(pool.size() - 3, pool.size()));
     }
 
     /**
      * 排序
      */
-    private static void sort(List<String> pokers) {
-        pokers.sort((o1, o2) -> o1.length() - o2.length() == 0 ? o1.compareTo(o2) : o1.length() - o2.length());
+    private static void sort(List<Card> pokers) {
+        pokers.sort((o1, o2) -> o1.getPriority() - o2.getPriority());
+    }
+
+    /**
+     * 扑克牌类
+     */
+    private static class Card{
+        /**
+         * 数字
+         */
+        private String num;
+        /**
+         * 花色
+         */
+        private String type;
+        /**
+         * 优先级
+         */
+        private int priority;
+
+        public Card() {
+        }
+
+        public Card(String num, String type, int priority) {
+            this.num = num;
+            this.type = type;
+            this.priority = priority;
+        }
+
+        public String getNum() {
+            return num;
+        }
+
+        public void setNum(String num) {
+            this.num = num;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public int getPriority() {
+            return priority;
+        }
+
+        public void setPriority(int priority) {
+            this.priority = priority;
+        }
+
+        @Override
+        public String toString() {
+            return "Card{" +
+                    "num='" + num + '\'' +
+                    ", type='" + type + '\'' +
+                    ", priority='" + priority + '\'' +
+                    '}';
+        }
     }
 }

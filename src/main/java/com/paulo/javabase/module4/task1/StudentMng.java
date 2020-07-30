@@ -1,22 +1,31 @@
-package com.paulo.javabase.module3;
+package com.paulo.javabase.module4.task1;
 
-import com.paulo.javabase.module4.task1.AgeException;
+import com.paulo.javabase.module3.Student;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 /**
- * 学生管理系统
- *  使用 List 集合实现简易的学生信息管理系统，要求打印字符界面提示用户选择相应的功 能，根据用户输入的选择去实现增加、删除、修改、查找以及遍历所有学生信息的功能。
- *
- *  其中学生的信息有：学号、姓名、年龄。 要求： 尽量将功能拆分为多个.java 文件。
+ * 基于学生信息管理系统增加以下两个功能：
+ * <p>
+ * a.自定义学号异常类和年龄异常类，并在该成员变量不合理时产生异常对象并抛出。
+ * <p>
+ * b.当系统退出时将 List 集合中所有学生信息写入到文件中，当系统启动时读取文件中所 有学生信息到 List 集合中。
  */
 public class StudentMng {
     private static List<Student> students = new ArrayList<>();
 
+    /**
+     * 保存学生信息的文件路径
+     */
+    private static final String FILE_PATH = "./data/students.txt";
 
     public static void main(String[] args) {
+
+        //加载之前学生信息
+        initStudents();
 
         System.out.println();
 
@@ -47,11 +56,94 @@ public class StudentMng {
 
                 default:
                     System.out.println("bye bye~");
+                    //将学生写入文件
+                    writeStudents2File();
                     return;
             }
         }
     }
 
+    /**
+     * 读取学生信息
+     */
+    private static void initStudents() {
+        File file = new File(FILE_PATH);
+
+        //文件存在再去读取
+        if (file.exists()) {
+            InputStream is = null;
+            ObjectInputStream ois = null;
+            try {
+                is = new FileInputStream(FILE_PATH);
+
+                ois = new ObjectInputStream(is);
+
+                Object o = ois.readObject();
+
+                if (null != o) {
+                    students = (List<Student>) o;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                if (null != ois) {
+                    try {
+                        ois.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (null != is) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        }
+
+        System.out.println("学生信息读取成功: " + students);
+    }
+
+
+    /**
+     * 将学生信息写入文件
+     */
+    private static void writeStudents2File() {
+        OutputStream os = null;
+        ObjectOutputStream oos = null;
+        try {
+            os = new FileOutputStream(FILE_PATH);
+
+            oos = new ObjectOutputStream(os);
+
+            oos.writeObject(students);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (null != oos) {
+                try {
+                    oos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+       /*     if(null != os){
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }*/
+        }
+
+        System.out.println("学生信息写入文件成功,文件路径: " + FILE_PATH);
+    }
 
     /**
      * 添加学生信息
@@ -82,7 +174,7 @@ public class StudentMng {
 
         int i = students.indexOf(new Student(stuNO, "", 0));
 
-        if(i < 0){
+        if (i < 0) {
             System.out.println("该学生信息不存在");
             return null;
         }
@@ -157,7 +249,11 @@ public class StudentMng {
         System.out.println("请依次输入学生的学号，姓名和年龄");
 
         String num = sc.next();
+
+
         String name = sc.next();
+
+
         int age = sc.nextInt();
 
         Student student = new Student(num, name, age);

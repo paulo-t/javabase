@@ -1,11 +1,17 @@
 package com.paulo.javabase.module3;
 
+import com.paulo.javabase.module4.task1.AgeException;
+import com.paulo.javabase.module4.task1.StuNoException;
+
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * 学生类
  */
-public class Student {
+public class Student implements Serializable {
+    private static final long serialVersionUID = 617934774695309681L;
+
     private String studentNo;
 
     private String name;
@@ -16,16 +22,26 @@ public class Student {
     }
 
     public Student(String studentNo, String name, int age) {
-        this.studentNo = studentNo;
-        this.name = name;
-        this.age = age;
+        try {
+            setStudentNo(studentNo);
+            setAge(age);
+        } catch (StuNoException e) {
+            e.printStackTrace();
+        } catch (AgeException e) {
+            e.printStackTrace();
+        }
+        setName(name);
     }
 
     public String getStudentNo() {
         return studentNo;
     }
 
-    public void setStudentNo(String studentNo) {
+    public void setStudentNo(String studentNo) throws StuNoException {
+        if (null == studentNo || !studentNo.matches("stu[0-9]{3}")) {
+            throw new StuNoException("学号格式必须是stu加31位数字");
+        }
+
         this.studentNo = studentNo;
     }
 
@@ -41,7 +57,10 @@ public class Student {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(int age) throws AgeException {
+        if(age <= 0 || age > 200){
+            throw new AgeException("年龄必须在(0-200]范围内");
+        }
         this.age = age;
     }
 
