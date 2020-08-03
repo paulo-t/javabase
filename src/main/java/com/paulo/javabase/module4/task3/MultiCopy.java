@@ -97,6 +97,8 @@ public class MultiCopy {
 
                 int len;
 
+                System.out.println("正在从"+ srcPath +"向" + targetPath + "拷贝");
+
                 while (-1 != (len = bis.read(buffer, 0, buffer.length))) {
                     bos.write(buffer,0,len);
                 }

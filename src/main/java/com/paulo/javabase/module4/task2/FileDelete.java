@@ -56,10 +56,14 @@ public class FileDelete {
 
     }
 
+    /**
+     * 删除问津
+     */
     private static void deleteFiles(File root){
 
-        //文件或者空文奸济恶直接删除
+        //文件或者空文件夹直接删除
         if(canDelete(root)){
+            System.out.println("正在删除: " + root.getAbsolutePath());
             root.delete();
 
             return;
@@ -73,6 +77,7 @@ public class FileDelete {
         }
 
         //删除当前文件夹
+        System.out.println("正在删除: " + root.getAbsolutePath());
         root.delete();
     }
 
