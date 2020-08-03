@@ -133,13 +133,6 @@ public class StudentMng {
                     e.printStackTrace();
                 }
             }
-       /*     if(null != os){
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }*/
         }
 
         System.out.println("学生信息写入文件成功,文件路径: " + FILE_PATH);
@@ -151,6 +144,10 @@ public class StudentMng {
     private static Student addStudent(Scanner sc) {
 
         Student student = tips(sc);
+
+        if(null == student){
+            return null;
+        }
 
         if (students.contains(student)) {
             System.out.println("该学生信息已经存在，请进行更新操作!");
@@ -168,21 +165,28 @@ public class StudentMng {
      */
     private static Student deleteStudent(Scanner sc) {
 
-        System.out.println("请输入学生的学号");
+        Student student = null;
+        try {
+            System.out.println("请输入学生的学号");
 
-        String stuNO = sc.next();
+            String stuNO = sc.next();
 
-        int i = students.indexOf(new Student(stuNO, "", 0));
+            int i = students.indexOf(new Student(stuNO, "", 0));
 
-        if (i < 0) {
-            System.out.println("该学生信息不存在");
-            return null;
+            if (i < 0) {
+                System.out.println("该学生信息不存在");
+                return null;
+            }
+
+            student = students.get(i);
+
+
+            students.remove(student);
+        } catch (StuNoException e) {
+            e.printStackTrace();
+        } catch (AgeException e) {
+            e.printStackTrace();
         }
-
-        Student student = students.get(i);
-
-
-        students.remove(student);
 
         return student;
     }
@@ -192,6 +196,10 @@ public class StudentMng {
      */
     private static boolean updateStudent(Scanner sc) throws AgeException {
         Student student = tips(sc);
+
+        if(null == student){
+            return false;
+        }
 
         int i = students.indexOf(student);
 
@@ -216,19 +224,26 @@ public class StudentMng {
      */
     private static Student findStudent(Scanner sc) {
 
-        System.out.println("请输入你要查找的学号");
+        Student student = null;
+        try {
+            System.out.println("请输入你要查找的学号");
 
-        String stuNo = sc.next();
+            String stuNo = sc.next();
 
-        int i = students.indexOf(new Student(stuNo, null, 0));
+            int i = students.indexOf(new Student(stuNo, null, 0));
 
-        if (i < 0) {
-            System.out.println("系统中不存在当前学生信息!");
-            return null;
+            if (i < 0) {
+                System.out.println("系统中不存在当前学生信息!");
+                return null;
+            }
+
+            student = students.get(i);
+            System.out.println("查找到的学生信息为: " + student);
+        } catch (StuNoException e) {
+            e.printStackTrace();
+        } catch (AgeException e) {
+            e.printStackTrace();
         }
-
-        Student student = students.get(i);
-        System.out.println("查找到的学生信息为: " + student);
 
         return student;
     }
@@ -246,17 +261,24 @@ public class StudentMng {
 
 
     private static Student tips(Scanner sc) {
-        System.out.println("请依次输入学生的学号，姓名和年龄");
+        Student student = null;
+        try {
+            System.out.println("请依次输入学生的学号，姓名和年龄");
 
-        String num = sc.next();
+            String num = sc.next();
 
 
-        String name = sc.next();
+            String name = sc.next();
 
 
-        int age = sc.nextInt();
+            int age = sc.nextInt();
 
-        Student student = new Student(num, name, age);
+            student = new Student(num, name, age);
+        } catch (StuNoException e) {
+            e.printStackTrace();
+        } catch (AgeException e) {
+            e.printStackTrace();
+        }
 
         return student;
     }

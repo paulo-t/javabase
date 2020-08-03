@@ -21,15 +21,11 @@ public class Student implements Serializable {
     public Student() {
     }
 
-    public Student(String studentNo, String name, int age) {
-        try {
-            setStudentNo(studentNo);
-            setAge(age);
-        } catch (StuNoException e) {
-            e.printStackTrace();
-        } catch (AgeException e) {
-            e.printStackTrace();
-        }
+    public Student(String studentNo, String name, int age) throws StuNoException, AgeException {
+
+        setStudentNo(studentNo);
+        setAge(age);
+
         setName(name);
     }
 
@@ -39,7 +35,7 @@ public class Student implements Serializable {
 
     public void setStudentNo(String studentNo) throws StuNoException {
         if (null == studentNo || !studentNo.matches("stu[0-9]{3}")) {
-            throw new StuNoException("学号格式必须是stu加31位数字");
+            throw new StuNoException("学号格式必须是stu加3位数字");
         }
 
         this.studentNo = studentNo;
@@ -58,7 +54,7 @@ public class Student implements Serializable {
     }
 
     public void setAge(int age) throws AgeException {
-        if(age <= 0 || age > 200){
+        if (age <= 0 || age > 200) {
             throw new AgeException("年龄必须在(0-200]范围内");
         }
         this.age = age;
