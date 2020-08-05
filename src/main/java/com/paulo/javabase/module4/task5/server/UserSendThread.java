@@ -2,6 +2,7 @@ package com.paulo.javabase.module4.task5.server;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.List;
 
 public class UserSendThread extends Thread {
@@ -12,9 +13,7 @@ public class UserSendThread extends Thread {
     private MessageQueue messageQueue;
 
 
-
-    public UserSendThread( MessageQueue messageQueue) {
-
+    public UserSendThread(MessageQueue messageQueue) {
         this.messageQueue = messageQueue;
     }
 
@@ -25,13 +24,15 @@ public class UserSendThread extends Thread {
 
         MessageEntity messageEntity;
 
-        while (null != (messageEntity = messageQueue.getMessage())) {
-            List<ConnectInfo> connectInfos = ConnectInfoMgr.allConnectInfo();
-            for (ConnectInfo connectInfo : connectInfos) {
-                if(messageEntity.getId() != connectInfo.getId()){
-                    //不是发送方
-                    System.out.println("开始向" + connectInfo.getId() + "群发消息");
-                    new SendThread(connectInfo, messageEntity).start();
+        while (true) {
+            if (null != (messageEntity = messageQueue.getMessage())) {
+                List<ConnectInfo> connectInfos = ConnectInfoMgr.allConnectInfo();
+                for (ConnectInfo connectInfo : connectInfos) {
+                    if (messageEntity.getId() != connectInfo.getId()) {
+                        //不是发送方
+                        System.out.println("开始向" + connectInfo.getId() + "群发消息");
+                        new SendThread(connectInfo, messageEntity).start();
+                    }
                 }
             }
         }
@@ -56,21 +57,20 @@ public class UserSendThread extends Thread {
 
         @Override
         public void run() {
-
-            BufferedOutputStream bos = null;
+            ObjectOutputStream oos = null;
             try {
-                bos = new BufferedOutputStream(connectInfo.getSocket().getOutputStream());
-                bos.write(messageEntity.getMessage());
+                oos = new ObjectOutputStream(connectInfo.getSocket().getOutputStream());
+                oos.writeObject(messageEntity);
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if (null != bos) {
+                /*if (null != oos) {
                     try {
-                        bos.close();
+                        oos.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
+                }*/
             }
         }
     }

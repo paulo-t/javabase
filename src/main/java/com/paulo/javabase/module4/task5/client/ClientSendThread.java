@@ -1,5 +1,7 @@
 package com.paulo.javabase.module4.task5.client;
 
+import com.paulo.javabase.module4.task5.server.MessageEntity;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
@@ -14,15 +16,13 @@ public class ClientSendThread extends Thread {
         this.socket = socket;
     }
 
-    private static final int FILE_MAX_SIZE = 1024 * 1024;
-
     @Override
     public void run() {
-        BufferedOutputStream bof = null;
+        ObjectOutputStream oos = null;
         Scanner sc = null;
 
         try {
-            bof = new BufferedOutputStream(socket.getOutputStream());
+            oos = new ObjectOutputStream(socket.getOutputStream());
             sc = new Scanner(System.in);
 
             while (true) {
@@ -30,14 +30,13 @@ public class ClientSendThread extends Thread {
 
                 String str = sc.next();
 
-                byte[] msg = extractMsg(str);
+                MessageEntity messageEntity = extractMsg(str);
 
-                if(null == msg){
+                if(null == messageEntity){
                     continue;
                 }
 
-                bof.write(msg,0,msg.length);
-                bof.flush();
+                oos.writeObject(messageEntity);
 
                 if("bye".equalsIgnoreCase(str)){
                     break;
@@ -47,9 +46,9 @@ public class ClientSendThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (null != bof) {
+            if (null != oos) {
                 try {
-                    bof.close();
+                    oos.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -72,47 +71,53 @@ public class ClientSendThread extends Thread {
     /**
      * 解析消息
      */
-    private byte[] extractMsg(String str) {
+    private MessageEntity extractMsg(String str) {
         try {
             if (null == str || "".equalsIgnoreCase(str)) {
                 return null;
             }
 
-            //消息
-            byte[] msg = null;
-
-            byte[] buffer = new byte[FILE_MAX_SIZE];
+            MessageEntity messageEntity = new MessageEntity();
 
             //是否是文件
             File file = new File(str);
-            if (file.exists()) {
-                if (file.length() <= 0) {
-                    System.out.println("文件为空");
-                    return null;
-                }
 
-                if (file.length() > FILE_MAX_SIZE) {
-                    System.out.println("文件大小超出限制");
-                    return null;
-                }
-
-
+            if (file.exists()) { //是文件
+                //文件类型
+                messageEntity.setType(getFileType(str));
+                messageEntity.setFileName(file.getName());
+                //读取文件数据流
                 BufferedInputStream fileBis = new BufferedInputStream(new FileInputStream(str));
 
+                byte[] buffer = new byte[1024];
                 int len;
                 if (-1 != (len = fileBis.read(buffer))) {
                     byte[] temp = new byte[len];
                     System.arraycopy(buffer, 0, temp, 0, len);
-                    msg = temp;
+                    messageEntity.appendMessage(temp);
                 }
             } else { //文本消息
-                msg = str.getBytes();
+                messageEntity.setType(0);
+                messageEntity.appendMessage(str.getBytes());
             }
 
-            return msg;
+            return messageEntity;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     *获取文件类型
+     */
+    private int getFileType(String str){
+        if(str.matches("w+.txt")){
+            return 2;
+        }else if(str.matches("w+.jpg")){
+            return 1;
+        }else {
+            return 3;
         }
     }
 }

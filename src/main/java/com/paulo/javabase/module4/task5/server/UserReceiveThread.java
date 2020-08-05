@@ -2,6 +2,7 @@ package com.paulo.javabase.module4.task5.server;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 
 /**
  * @author: create by paulo
@@ -22,10 +23,6 @@ public class UserReceiveThread extends Thread {
     private MessageQueue messageQueue;
 
 
-    /**
-     * 文件最大大小1M
-     */
-    private static final int FILE_MAX_SIZE = 1024 * 1024;
 
     public UserReceiveThread(ConnectInfo connectInfo, MessageQueue messageQueue) {
         this.connectInfo = connectInfo;
@@ -35,48 +32,36 @@ public class UserReceiveThread extends Thread {
 
     @Override
     public void run() {
-        System.out.println(connectInfo.getName()+"接收线程启动完毕");
+        System.out.println(connectInfo.getName() + "接收线程启动完毕");
 
-        BufferedInputStream bis = null;
+        ObjectInputStream ois = null;
 
         try {
-            bis = new BufferedInputStream(connectInfo.getSocket().getInputStream());
+            ois = new ObjectInputStream(connectInfo.getSocket().getInputStream());
 
             while (true) {
+                Object obj = ois.readObject();
+                System.out.println("接收到来自" + connectInfo.getId() + "的消息: " + obj);
 
-                //将文件放入消息队列
-                byte[] buffer = new byte[FILE_MAX_SIZE];
-
-                int len;
-
-                //客户端是否断开
-                boolean isEnd = false;
-
-                while (-1 != (len = bis.read(buffer))) {
-
-                    byte[] auxArr = new byte[len];
-                    System.arraycopy(buffer, 0, auxArr, 0, len);
-
-                    if ("bye".equalsIgnoreCase(new String(auxArr))) {
-                        isEnd = true;
-                    }
-
-                    MessageEntity messageEntity = new MessageEntity(connectInfo.getId(), connectInfo.getName(), auxArr);
-                    System.out.println("接收到来自" + connectInfo.getId() + "的消息: " + new String(auxArr));
+                if (null != obj) {
+                    MessageEntity messageEntity = (MessageEntity) obj;
+                    messageEntity.setId(connectInfo.getId());
+                    messageEntity.setName(connectInfo.getName());
                     messageQueue.addMessage(messageEntity);
-                }
 
-                if (isEnd) {
-                    break;
+                    if (null != messageEntity.getMessage() && 0 == messageEntity.getType() && "bye".equalsIgnoreCase(new String(messageEntity.getMessage()))) {
+                        break;
+                    }
                 }
             }
-
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } finally {
-            if (null != bis) {
+            if (null != ois) {
                 try {
-                    bis.close();
+                    ois.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
